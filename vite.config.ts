@@ -4,17 +4,16 @@ import * as path from "path";
 import { defineConfig } from "vite";
 import { globSync } from "glob";
 
-const writeIndexHTML = (basePath: string = '') => {
+const writeIndexHTML = () => {
   let links: string = "";
   const examplePaths = globSync("packages/**/src/**/example*.html");
   for (const examplePath of examplePaths) {
-    const relativePath = path.relative('.', `${basePath}${examplePath}`);
     const directory = path.dirname(examplePath);
     const packageNameMatch = directory.match(/packages\\([^\\]+)/);
     if (!(packageNameMatch && packageNameMatch.length > 1)) continue;
     const packageName = packageNameMatch[1];
     const exampleName = path.basename(directory);
-    links += `<a style="width: fit-content;" href="${relativePath}">${packageName}/${exampleName}</a>\n`;
+    links += `<a style="width: fit-content;" href="./${examplePath}">${packageName}/${exampleName}</a>\n`;
   }
   const index = `
   <!DOCTYPE html>
@@ -51,20 +50,14 @@ const writeIndexHTML = (basePath: string = '') => {
   fs.writeFileSync("./index.html", index);
 };
 
-const createIndex = (basePath: string = '') => ({
+const createIndex = () => ({
   name: "create-index",
   configureServer() {
-    writeIndexHTML(basePath);
-  },
-  buildStart: () => {
-    writeIndexHTML(basePath);
+    // fs.watch("./packages", { recursive: true }, writeIndexHTML);
+    writeIndexHTML();
   },
 });
 
 export default defineConfig({
-  base: '/',
   plugins: [createIndex()],
-  build: {
-    outDir: 'dist',
-  }
 });
