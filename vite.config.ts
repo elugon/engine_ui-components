@@ -59,14 +59,5 @@ const createIndex = () => ({
 });
 
 export default defineConfig({
-  base: "/", // Use root base path
   plugins: [createIndex()],
-  build: {
-    outDir: "dist",
-    rollupOptions: {
-      input: {
-        main: path.resolve(__dirname, "index.html"),
-      },
-    },
-  },
 });

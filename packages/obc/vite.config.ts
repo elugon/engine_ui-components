@@ -5,34 +5,22 @@ import * as path from "path";
 import * as packageJson from "./package.json";
 
 export default defineConfig({
-  base: "./", // Ensure correct path resolution for web deployment
   build: {
     outDir: "./dist",
     lib: {
       entry: path.resolve(__dirname, "src/index.ts"),
-      formats: ["es"], // Keep ES module format
+      formats: ["es"],
       fileName: "index",
     },
     rollupOptions: {
-      external: [
-        ...Object.keys(packageJson.peerDependencies || {}),
-        "three",
-        "@thatopen/ui-components",
-      ],
+      external: Object.keys(packageJson.peerDependencies),
       output: {
         globals: {
           three: "THREE",
           "@thatopen/ui-components": "BUI",
         },
-        // Ensure proper asset and chunk handling
-        manualChunks(id) {
-          if (id.includes("node_modules")) {
-            return "vendor";
-          }
-        }
       },
     },
-    sourcemap: true, // Add source maps for debugging
   },
   plugins: [
     dts({
@@ -40,10 +28,4 @@ export default defineConfig({
       exclude: ["./src/**/example.ts", "./src/**/*.test.ts"],
     }),
   ],
-  resolve: {
-    alias: {
-      // Optional: Add any necessary path aliases
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
 });
